@@ -17,7 +17,7 @@
             width: 100%;
             height: 80vh;
             border: 1px solid black;
-            cursor: crosshair;
+            cursor: pointer;
         }
         #quote-input {
             display: block;
@@ -37,7 +37,6 @@
         const canvas = document.getElementById('canvas');
         const quoteInput = document.getElementById('quote-input');
         const gridSize = 20;
-        let lastPixelCreationTime = null;
         const pixelCreationCooldown = 300000; // 5 minutes in milliseconds
 
         function randomColor() {
@@ -60,7 +59,9 @@
         }
 
         function createPixel(event) {
+            const lastPixelCreationTime = parseInt(localStorage.getItem('lastPixelCreationTime'));
             const currentTime = new Date().getTime();
+
             if (lastPixelCreationTime && currentTime - lastPixelCreationTime < pixelCreationCooldown) {
                 const timeRemaining = Math.ceil((pixelCreationCooldown - (currentTime - lastPixelCreationTime)) / 1000);
                 alert(`Please wait ${timeRemaining} seconds before creating another pixel.`);
@@ -89,7 +90,15 @@
             };
 
             canvas.appendChild(pixel);
-            lastPixelCreationTime = currentTime;
+            localStorage.setItem('lastPixelCreationTime', currentTime);
+
+            const pixelsData = JSON.parse(localStorage.getItem('pixelsData')) || [];
+            pixelsData.push({
+                gridY: gridY,
+                backgroundColor: pixel.style.backgroundColor,
+                quote: quote
+            });
+            localStorage.setItem('pixelsData', JSON.stringify(pixelsData));
         }
 
         function handleClick(event) {
@@ -99,7 +108,29 @@
             }
         }
 
+        function loadPixels() {
+            const pixelsData = JSON.parse(localStorage.getItem('pixelsData')) || [];
+            pixelsData.forEach(pixelData => {
+                const pixel = document.createElement('div');
+                pixel.style.position = 'absolute';
+                pixel.style.width = `${gridSize}px`;
+                pixel.style.height = `${gridSize}px`;
+                pixel.style.backgroundColor = pixelData.backgroundColor;
+                pixel.style.left = `${pixelData.gridX}px`;
+                pixel.style.top = `${pixelData.gridY}px`;
+
+                pixel.onclick = function(event) {
+                    event.stopPropagation();
+                    alert(pixelData.quote);
+                };
+
+                canvas.appendChild(pixel);
+            });
+        }
+
         canvas.addEventListener('click', handleClick);
+        loadPixels();
     </script>
 </body>
 </html>
+
