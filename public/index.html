@@ -59,6 +59,8 @@
         }
 
         function createPixel(event) {
+            const canvasRect = canvas.getBoundingClientRect();
+
             const lastPixelCreationTime = parseInt(localStorage.getItem('lastPixelCreationTime'));
             const currentTime = new Date().getTime();
 
@@ -71,8 +73,8 @@
             const quote = quoteInput.value.trim();
             if (!quote) return;
 
-            const gridX = Math.floor((event.pageX - canvas.offsetLeft) / gridSize) * gridSize;
-            const gridY = Math.floor((event.pageY - canvas.offsetTop) / gridSize) * gridSize;
+            const gridX = Math.floor((event.pageX - canvasRect.left) / gridSize) * gridSize;
+            const gridY = Math.floor((event.pageY - canvasRect.top) / gridSize) * gridSize;
 
             if (isPixelPresent(gridX, gridY)) return;
 
@@ -94,6 +96,7 @@
 
             const pixelsData = JSON.parse(localStorage.getItem('pixelsData')) || [];
             pixelsData.push({
+                gridX: gridX,
                 gridY: gridY,
                 backgroundColor: pixel.style.backgroundColor,
                 quote: quote
