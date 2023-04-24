@@ -37,6 +37,8 @@
         const canvas = document.getElementById('canvas');
         const quoteInput = document.getElementById('quote-input');
         const gridSize = 20;
+        let lastPixelCreationTime = null;
+        const pixelCreationCooldown = 300000; // 5 minutes in milliseconds
 
         function randomColor() {
             const letters = '0123456789ABCDEF';
@@ -57,29 +59,11 @@
             return false;
         }
 
-        function setCookie(name, value, days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            const expires = "expires=" + date.toUTCString();
-            document.cookie = name + "=" + value + ";" + expires + ";path=/";
-        }
-
-        function getCookie(name) {
-            const nameWithEquals = name + "=";
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const cookies = decodedCookie.split(';');
-            for(let i = 0; i < cookies.length; i++) {
-                let cookie = cookies[i].trim();
-                if (cookie.indexOf(nameWithEquals) === 0) {
-                    return cookie.substring(nameWithEquals.length, cookie.length);
-                }
-            }
-            return "";
-        }
-
-        async function createPixel(event) {
-            if (getCookie("pixelCreated") === "true") {
-                alert("You can only create one pixel per user.");
+        function createPixel(event) {
+            const currentTime = new Date().getTime();
+            if (lastPixelCreationTime && currentTime - lastPixelCreationTime < pixelCreationCooldown) {
+                const timeRemaining = Math.ceil((pixelCreationCooldown - (currentTime - lastPixelCreationTime)) / 1000);
+                alert(`Please wait ${timeRemaining} seconds before creating another pixel.`);
                 return;
             }
 
@@ -105,7 +89,7 @@
             };
 
             canvas.appendChild(pixel);
-            setCookie("pixelCreated", "true", 365);
+            lastPixelCreationTime = currentTime;
         }
 
         function handleClick(event) {
@@ -119,4 +103,3 @@
     </script>
 </body>
 </html>
-
