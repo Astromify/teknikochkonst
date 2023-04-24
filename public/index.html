@@ -17,7 +17,7 @@
             width: 100%;
             height: 80vh;
             border: 1px solid black;
-            cursor: pointer;
+            cursor: crosshair;
         }
         #quote-input {
             display: block;
@@ -37,7 +37,7 @@
         const canvas = document.getElementById('canvas');
         const quoteInput = document.getElementById('quote-input');
         const gridSize = 20;
-        const pixelCreationCooldown = 300000; // 5 minutes in milliseconds
+        const pixelCreationCooldown = 60000; // 5 minutes in milliseconds
 
         function randomColor() {
             const letters = '0123456789ABCDEF';
